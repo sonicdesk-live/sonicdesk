@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sonic Desk</title>
+<style>
+:root{--bg:#05060a;--panel:#0a0c12;--line:#161a24;--tx:#d7dbe6;--mut:#6b7285;--up:#27e08a;--dn:#ff4d5e;--amb:#ff9f2e;--vio:#a65bff;--blu:#3d7bff;--pink:#ff3fa4;--son:#2f7bff}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--tx);font:12px/1.35 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+body{max-width:1180px;margin:0 auto;padding:0 0 24px}
+.top{display:flex;align-items:center;gap:18px;padding:10px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:8px;font:700 15px system-ui,sans-serif;letter-spacing:.04em}
+.logo i{width:20px;height:20px;border-radius:50%;background:var(--son);display:inline-block;box-shadow:0 0 12px var(--son)}
+.logo small{display:block;font:500 8px monospace;color:var(--mut);letter-spacing:.14em}
+.kv{display:flex;flex-direction:column}.kv b{font:700 14px system-ui,sans-serif;font-variant-numeric:tabular-nums}.kv span{font-size:8px;color:var(--mut);letter-spacing:.12em}
+.sp{flex:1}
+.clock{font:700 20px system-ui,sans-serif;font-variant-numeric:tabular-nums}
+.pill{border:1px solid #5c4a1d;color:var(--amb);padding:4px 8px;border-radius:4px;font-size:9px;letter-spacing:.12em}
+.mult{display:flex;flex-direction:column;gap:2px;font-size:8px;color:var(--mut);letter-spacing:.12em}
+.mult select{background:#05060a;border:1px solid #232938;color:var(--tx);font:700 14px system-ui,sans-serif;padding:3px 6px;border-radius:4px}
+.ticker{border-bottom:1px solid var(--line);padding:6px 14px;color:var(--mut);white-space:nowrap;overflow:hidden;font-size:10px}
+.ticker .in{display:inline-block;animation:tk 80s linear infinite}
+@keyframes tk{to{transform:translateX(-50%)}}
+.ticker b{color:var(--tx)}.up{color:var(--up)}.dn{color:var(--dn)}
+.row{display:grid;gap:8px;padding:8px 8px 0}
+.r1{grid-template-columns:1fr 1.3fr}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px;position:relative;overflow:hidden;min-width:0}
+.h{font-size:9px;letter-spacing:.14em;color:var(--mut);margin-bottom:8px;display:flex;justify-content:space-between;gap:8px}
+.h b{color:var(--tx)}
+.big{font:700 40px system-ui,sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.sub{color:var(--mut);font-size:10px;margin-top:2px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.stats div b{display:block;font:700 15px system-ui,sans-serif;font-variant-numeric:tabular-nums}.stats div span{font-size:8px;color:var(--mut);letter-spacing:.1em}
+canvas{display:block;width:100%}
+#eq{height:230px}
+.orbit{margin:8px 8px 0;padding:0;height:380px}
+#orb{height:100%}
+.orbit .h{position:absolute;left:10px;right:10px;top:10px;z-index:2;pointer-events:none}
+.orbit .px{position:absolute;left:10px;top:34px;font:700 14px system-ui,sans-serif;z-index:2}
+.orbit .px2{position:absolute;right:12px;top:34px;font:700 14px system-ui,sans-serif;z-index:2;text-align:right}
+.agents{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;padding:8px 8px 0}
+.ag{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:8px;display:flex;gap:8px;align-items:center;transition:.25s;opacity:.55}
+.ag.on{opacity:1;border-color:var(--c);box-shadow:0 0 14px -4px var(--c)}
+.ag .ic{width:22px;height:22px;border-radius:50%;background:var(--c);flex:none}
+.ag b{font:700 11px system-ui,sans-serif;letter-spacing:.06em;display:block}
+.ag span{font-size:8px;color:var(--mut);display:block}
+.r3{grid-template-columns:1.3fr 1fr}
+#mon{height:210px}
+.cal{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.cal div{border:1px solid var(--line);border-radius:5px;padding:6px 7px}
+.cal b{display:block;font:700 12px system-ui,sans-serif;font-variant-numeric:tabular-nums}.cal span{font-size:8px;color:var(--mut);letter-spacing:.08em}
+.cal .cur{border-color:var(--son);box-shadow:0 0 12px -4px var(--son)}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th{font-size:8px;color:var(--mut);letter-spacing:.1em;text-align:right;font-weight:400;padding:3px 4px;border-bottom:1px solid var(--line)}th:first-child,td:first-child{text-align:left}
+td{text-align:right;padding:4px;border-bottom:1px solid #10131b;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tw{max-height:300px;overflow:auto}
+.note{padding:10px 14px 0;color:var(--mut);font-size:10px;line-height:1.55}
+@media(max-width:820px){
+ .r1,.r3{grid-template-columns:1fr}.agents{grid-template-columns:repeat(3,1fr)}.cal{grid-template-columns:repeat(3,1fr)}
+ .orbit{height:330px}.top{gap:10px}.big{font-size:32px}
+}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="logo"><i></i><div>SONIC DESK<small>ЗОЛОТО · XAUUSD · МОНИТОР ТОРГОВЛИ</small></div></div>
+  <div class="kv"><b id="k_m">—</b><span id="k_ml">ЗА МЕСЯЦ</span></div>
+  <div class="kv"><b id="k_all">—</b><span>ВСЕГО С НАЧАЛА</span></div>
+  <div class="kv"><b id="k_n">—</b><span>СДЕЛОК</span></div>
+  <div class="kv"><b id="k_wr">—</b><span>ВИНРЕЙТ</span></div>
+  <div class="sp"></div>
+  <label class="mult">МНОЖИТЕЛЬ<select id="mul"><option>1</option><option>12</option><option selected>24</option></select></label>
+  <div class="kv"><div class="clock" id="clock">--:--:--</div><span>UTC</span></div>
+  <div class="pill" id="pill">ИСТОРИЯ</div>
+</div>
+<div class="ticker"><div class="in" id="tick"></div></div>
+
+<div class="row r1">
+  <div class="card">
+    <div class="h"><span>◆ ПРИБЫЛЬ ЗА МЕСЯЦ · <b id="mx"></b></span><span id="mname">—</span></div>
+    <div class="big" id="mbig">—</div>
+    <div class="sub" id="msub"></div>
+    <div class="stats">
+      <div><b id="m_n">—</b><span>СДЕЛОК В МЕСЯЦЕ</span></div>
+      <div><b id="m_wr">—</b><span>ВИНРЕЙТ МЕСЯЦА</span></div>
+      <div><b id="m_prev">—</b><span id="m_prevl">ПРОШЛЫЙ МЕСЯЦ</span></div>
+      <div><b id="s_pf">—</b><span>PROFIT FACTOR</span></div>
+      <div><b id="s_dd">—</b><span>МАКС. ПРОСАДКА, $</span></div>
+      <div><b id="s_avg">—</b><span>В СРЕДНЕМ ЗА СДЕЛКУ</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="h"><span>◆ КРИВАЯ СЧЁТА · ВСЯ ИСТОРИЯ ОТ ПЕРВОЙ СДЕЛКИ</span><span id="eqmeta">—</span></div>
+    <canvas id="eq"></canvas>
+  </div>
+</div>
+
+<div class="card orbit">
+  <div class="h"><span>◆ СОНИК · ШЕСТЬ СИГНАЛОВ · ЗОЛОТО</span><span id="orbmeta">ПОВТОР ИСТОРИИ</span></div>
+  <div class="px" id="orbL"></div><div class="px2" id="orbR"></div>
+  <canvas id="orb"></canvas>
+</div>
+<div class="agents" id="agents"></div>
+
+<div class="row r3">
+  <div class="card">
+    <div class="h"><span>◆ ПО МЕСЯЦАМ · ПРИБЫЛЬ С МНОЖИТЕЛЕМ</span><b id="mxl"></b></div>
+    <canvas id="mon"></canvas>
+    <div class="cal" id="cal" style="margin-top:10px"></div>
+  </div>
+  <div class="card">
+    <div class="h"><span>◆ ПОСЛЕДНИЕ СДЕЛКИ</span><span>С МНОЖИТЕЛЕМ</span></div>
+    <div class="tw"><table id="tt"></table></div>
+  </div>
+</div>
+
+<div class="note">
+  Это история сделок публичного счёта Sonic AI на Myfxbook (XAUUSD), пересчитанная с множителем: каждая сделка умножается на выбранное число (по умолчанию ×24). Счёт и деньги на сайте не показываются.
+  Пересчёт линейный: он не учитывает проскальзывание, маржу и задержку копирования, поэтому реальный результат при ×24 может быть хуже.
+  Сделки до 18 сентября 2025 (метка на графике) появились до публичного запуска и похожи на добавленные задним числом — смотри живую часть отдельно.
+  Шесть сигналов вокруг Sonic — образ, а не его настоящая логика: как именно Sonic принимает решения, неизвестно.
+  Неофициальный монитор, не связан с Sonic AI. Не является инвестиционной рекомендацией.
+</div>
+
+<script>
+const MN=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+const AG=[['УРОВНИ','#2f7bff','ключевые цены'],['СТРУКТУРА','#27e08a','пробой / разворот'],['ЛИКВИДНОСТЬ','#ff9f2e','сбор стопов'],['ПОДТВЕРЖДЕНИЕ','#a65bff','реакция цены'],['ИМПУЛЬС','#ff3fa4','скорость'],['ВХОД','#27d6c0','сделка']];
+const $=id=>document.getElementById(id);
+const fm=(x,d=2)=>x==null||isNaN(x)?'—':x.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+const usd=x=>{const a=Math.abs(x);return(x<0?'−':'')+'$'+(a>=1e6?fm(a/1e6,2)+'M':fm(a,0))};
+const sgn=x=>(x>=0?'+':'−')+'$'+fm(Math.abs(x),0);
+const dpr=Math.min(2,window.devicePixelRatio||1);
+function fit(cv){const w=cv.clientWidth,h=cv.clientHeight;if(cv.width!==w*dpr||cv.height!==h*dpr){cv.width=w*dpr;cv.height=h*dpr}return cv.getContext('2d')}
+let D=null,TR=[],M=1,mon=[],stage=-1,replay=0,floaters=[],logs=[];
+const mult=()=>+$('mul').value;
+const dt=t=>new Date(t*1000);
+const hh=t=>dt(t).toISOString().slice(5,16).replace('T',' ');
+
+function prep(){
+  // сделки отсортированы по открытию; результат считаем по моменту закрытия
+  TR=D.trades.map(r=>({o:r[0],c:r[0]+r[1]*60,d:r[1],s:r[2],l:r[3],po:r[4],pc:r[5],p:r[6]})).sort((a,b)=>a.c-b.c);
+  const g={};TR.forEach(t=>{const d=dt(t.c),k=d.getUTCFullYear()*100+d.getUTCMonth();(g[k]=g[k]||{y:d.getUTCFullYear(),m:d.getUTCMonth(),p:0,n:0,w:0,k}).p+=t.p;g[k].n++;if(t.p>0)g[k].w++});
+  mon=Object.values(g).sort((a,b)=>a.k-b.k);
+}
+function stats(){
+  let eq=0,peak=0,dd=0,gw=0,gl=0,w=0;
+  TR.forEach(t=>{eq+=t.p*M;peak=Math.max(peak,eq);dd=Math.max(dd,peak-eq);if(t.p>0){w++;gw+=t.p}else gl-=t.p});
+  return{eq,dd,pf:gl?gw/gl:0,wr:w/TR.length,n:TR.length,avg:eq/TR.length}
+}
+function fill(){
+  if(!D)return;M=mult();const S=stats(),cur=mon.at(-1),prev=mon.at(-2);
+  $('mx').textContent='×'+M;$('mxl').textContent='×'+M;
+  const lastd=dt(D.asof),partial=lastd.getUTCDate()<28;
+  $('mname').textContent=(MN[cur.m]+' '+cur.y).toUpperCase()+(partial?' · ДАННЫЕ ПО '+lastd.getUTCDate()+' '+MN[cur.m].slice(0,3).toUpperCase():'');
+  $('mbig').innerHTML=`<span class="${cur.p>=0?'up':'dn'}">${sgn(cur.p*M)}</span>`;
+  $('msub').textContent=`Sonic принёс за ${MN[cur.m].toLowerCase()} с учётом множителя ×${M}`;
+  $('m_n').textContent=cur.n;$('m_wr').textContent=fm(cur.w/cur.n*100,0)+'%';
+  $('m_prevl').textContent=(MN[prev.m]+' '+prev.y).toUpperCase();$('m_prev').innerHTML=`<span class="${prev.p>=0?'up':'dn'}">${sgn(prev.p*M)}</span>`;
+  $('s_pf').textContent=fm(S.pf,2);$('s_dd').innerHTML=`<span class="dn">−$${fm(S.dd,0)}</span>`;$('s_avg').textContent=sgn(S.avg);
+  $('k_m').innerHTML=`<span class="${cur.p>=0?'up':'dn'}">${sgn(cur.p*M)}</span>`;$('k_ml').textContent=MN[cur.m].toUpperCase()+' · ×'+M;
+  $('k_all').innerHTML=`<span class="up">${usd(S.eq)}</span>`;$('k_n').textContent=S.n;$('k_wr').textContent=fm(S.wr*100,1)+'%';
+  $('pill').textContent='ИСТОРИЯ ДО '+lastd.toISOString().slice(0,10);
+  $('eqmeta').textContent=`${hh(TR[0].c).slice(0,5)} → ${lastd.toISOString().slice(5,10)} · ${S.n} СДЕЛОК`;
+  $('tick').innerHTML=(TR.slice(-24).reverse().map(t=>`<b>${t.s>0?'BUY':'SELL'}</b> ${fm(t.l,2)} лота <span class="${t.p>=0?'up':'dn'}">${sgn(t.p*M)}</span>`).join(' &nbsp;│&nbsp; ')+' &nbsp;│&nbsp; ').repeat(2);
+  drawEq();drawMon();table();cal();
+}
+function drawEq(){
+  const cv=$('eq'),x=fit(cv),W=cv.width,H=cv.height;x.clearRect(0,0,W,H);
+  let e=0;const pts=[[TR[0].o,0],...TR.map(t=>[t.c,(e+=t.p*M)])];
+  const t0=pts[0][0],t1=pts.at(-1)[0],mx=Math.max(...pts.map(p=>p[1])),pad=16*dpr;
+  const X=t=>(t-t0)/(t1-t0)*W,Y=v=>H-pad-v/(mx||1)*(H-2*pad);
+  x.font=`${9*dpr}px monospace`;x.fillStyle='#6b7285';x.strokeStyle='#161a24';x.lineWidth=dpr;
+  for(const [y,m] of [[2024,10],[2025,0],[2025,6],[2026,0],[2026,6]]){const t=Date.UTC(y,m,1)/1000;if(t<t0||t>t1)continue;x.beginPath();x.moveTo(X(t),0);x.lineTo(X(t),H);x.stroke();x.fillText(MN[m].slice(0,3)+' '+y,X(t)+3*dpr,H-3*dpr)}
+  const L=D.launch;if(L>t0&&L<t1){x.setLineDash([3*dpr,4*dpr]);x.strokeStyle='#ff9f2e';x.beginPath();x.moveTo(X(L),0);x.lineTo(X(L),H);x.stroke();x.setLineDash([]);x.fillStyle='#ff9f2e';x.fillText('ПУБЛИЧНЫЙ ЗАПУСК',X(L)+4*dpr,12*dpr)}
+  const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'rgba(47,123,255,.32)');g.addColorStop(1,'rgba(47,123,255,0)');
+  x.beginPath();pts.forEach((p,i)=>i?x.lineTo(X(p[0]),Y(p[1])):x.moveTo(X(p[0]),Y(p[1])));x.strokeStyle='#4d8dff';x.lineWidth=1.6*dpr;x.stroke();x.lineTo(W,H);x.lineTo(0,H);x.fillStyle=g;x.fill();
+  x.fillStyle='#d7dbe6';x.font=`700 ${12*dpr}px system-ui`;x.fillText(usd(mx),6*dpr,12*dpr+ (L>t0?14*dpr:0));
+}
+function drawMon(){
+  const cv=$('mon'),x=fit(cv),W=cv.width,H=cv.height;x.clearRect(0,0,W,H);
+  const v=mon.map(m=>m.p*M),mx=Math.max(...v.map(Math.abs),1),pad=16*dpr,z=H*.62,n=mon.length,bw=W/n;
+  x.strokeStyle='#232938';x.beginPath();x.moveTo(0,z);x.lineTo(W,z);x.stroke();
+  mon.forEach((m,i)=>{const val=m.p*M,h=Math.abs(val)/mx*(val>=0?z-pad:H-z-pad),last=i===n-1;
+    x.fillStyle=val>=0?(last?'#27e08a':'rgba(39,224,138,.65)'):(last?'#ff4d5e':'rgba(255,77,94,.65)');
+    x.fillRect(i*bw+bw*.15,val>=0?z-h:z,bw*.7,Math.max(1,h));
+    x.fillStyle='#6b7285';x.font=`${8*dpr}px monospace`;x.textAlign='center';x.fillText(MN[m.m].slice(0,3),i*bw+bw/2,H-2*dpr);x.textAlign='left'});
+}
+function cal(){
+  $('cal').innerHTML=mon.slice().reverse().slice(0,12).map((m,i)=>`<div class="${i?'':'cur'}"><span>${MN[m.m].toUpperCase().slice(0,3)} ${m.y}</span><b class="${m.p>=0?'up':'dn'}">${sgn(m.p*M)}</b><span>${m.n} сд · ${fm(m.w/m.n*100,0)}%</span></div>`).join('');
+}
+function table(){
+  $('tt').innerHTML='<tr><th>ЗАКРЫТО</th><th>СТОРОНА</th><th>ЛОТ</th><th>ВХОД→ВЫХОД</th><th>МИН</th><th>РЕЗУЛЬТАТ</th></tr>'+
+   TR.slice(-40).reverse().map(t=>`<tr><td>${hh(t.c)}</td><td class="${t.s>0?'up':'dn'}">${t.s>0?'BUY':'SELL'}</td><td>${fm(t.l,2)}</td><td>${fm(t.po,1)}→${fm(t.pc,1)}</td><td>${t.d}</td><td class="${t.p>=0?'up':'dn'}">${sgn(t.p*M)}</td></tr>`).join('');
+}
+// ---- сигналы ----
+$('agents').innerHTML=AG.map((a,i)=>`<div class="ag" id="ag${i}" style="--c:${a[1]}"><div class="ic"></div><div><b>${i+1} · ${a[0]}</b><span>${a[2]}</span></div></div>`).join('');
+setInterval(()=>{if(!D)return;stage=(stage+1)%6;for(let i=0;i<6;i++)$('ag'+i).classList.toggle('on',i===stage);
+  if(stage===5){const t=TR[TR.length-40+(replay++%40)];floaters.push({t:performance.now(),txt:(t.p>=0?'+':'−')+'$'+fm(Math.abs(t.p*M),0),col:t.p>=0?'#27e08a':'#ff4d5e',side:t.s,tr:t})}},1300);
+// ---- орбита: Sonic ----
+const trails=[];for(let i=0;i<220;i++)trails.push({a:Math.random()*6.283,s:.15+Math.random()*.5,rx:.78+Math.random()*.4,ry:.7+Math.random()*.45,ph:Math.random()*6.283,k:i%6,o:.12+Math.random()*.3});
+const t0=performance.now();
+function sonic(x,cx,cy,R,t,look){
+  // колючки
+  x.fillStyle='#2f7bff';
+  for(let i=0;i<5;i++){const a=Math.PI*(.62+i*.2)+Math.sin(t*2+i)*.03;x.beginPath();x.moveTo(cx+Math.cos(a-.2)*R*.8,cy+Math.sin(a-.2)*R*.8);x.lineTo(cx+Math.cos(a)*R*1.75,cy+Math.sin(a)*R*1.75-R*.15);x.lineTo(cx+Math.cos(a+.2)*R*.8,cy+Math.sin(a+.2)*R*.8);x.fill()}
+  const g=x.createRadialGradient(cx,cy,R*.4,cx,cy,R*2.4);g.addColorStop(0,'rgba(47,123,255,.35)');g.addColorStop(1,'rgba(47,123,255,0)');x.fillStyle=g;x.beginPath();x.arc(cx,cy,R*2.4,0,7);x.fill();
+  x.fillStyle='#2f7bff';x.beginPath();x.arc(cx,cy,R,0,7);x.fill();
+  x.fillStyle='#f3cfa6';x.beginPath();x.ellipse(cx+R*.1,cy+R*.28,R*.62,R*.5,0,0,7);x.fill();
+  const ex=look.x,ey=look.y;
+  for(const dx of[-1,1]){const px=cx+dx*R*.28+ex*R*.1,py=cy-R*.18+ey*R*.08;x.fillStyle='#fff';x.beginPath();x.ellipse(px,py,R*.22,R*.3,0,0,7);x.fill();x.fillStyle='#0a0a0a';x.beginPath();x.arc(px+ex*R*.08,py+ey*R*.1,R*.09,0,7);x.fill()}
+  x.fillStyle='#0a0a0a';x.beginPath();x.arc(cx+R*.06,cy+R*.2,R*.07,0,7);x.fill();
+}
+let look={x:0,y:0};
+function orbit(now){
+  const cv=$('orb'),x=fit(cv),W=cv.width,H=cv.height,cx=W/2,cy=H*.54,RX=W*.36,RY=H*.27,t=(now-t0)/1000;x.clearRect(0,0,W,H);
+  x.lineWidth=dpr*.8;
+  for(const p of trails){const a=p.a+t*p.s*.25,a2=a-.35;x.strokeStyle=AG[p.k][1];x.globalAlpha=p.o*(.6+.4*Math.sin(t*.7+p.ph));
+    x.beginPath();for(let k=0;k<=8;k++){const aa=a2+(a-a2)*k/8,wob=1+.04*Math.sin(aa*3+p.ph+t*.4);const X=cx+Math.cos(aa)*RX*p.rx*wob,Y=cy+Math.sin(aa)*RY*p.ry*wob+Math.sin(aa*5+t)*4*dpr;k?x.lineTo(X,Y):x.moveTo(X,Y)}x.stroke()}
+  x.globalAlpha=1;x.strokeStyle='rgba(47,123,255,.5)';x.lineWidth=1.5*dpr;x.beginPath();x.ellipse(cx,cy,RX*.82,RY*.82,0,0,7);x.stroke();
+  const pos=AG.map((a,i)=>{const an=t*.1+i/6*6.283;return{i,X:cx+Math.cos(an)*RX,Y:cy+Math.sin(an)*RY}});
+  const act=stage<0?0:stage,sc=pos[act];look.x+=((sc.X-cx)/RX-look.x)*.08;look.y+=((sc.Y-cy)/RY-look.y)*.08;
+  x.strokeStyle=AG[act][1];x.globalAlpha=.5+.3*Math.sin(t*8);x.lineWidth=1.8*dpr;x.beginPath();x.moveTo(cx,cy);x.quadraticCurveTo((cx+sc.X)/2,(cy+sc.Y)/2-30*dpr,sc.X,sc.Y);x.stroke();x.globalAlpha=1;
+  pos.forEach(({i,X,Y})=>{const R=(i===act?21:16)*dpr,col=AG[i][1];
+    const g=x.createRadialGradient(X,Y,R*.2,X,Y,R*2.2);g.addColorStop(0,col+'66');g.addColorStop(1,col+'00');x.fillStyle=g;x.beginPath();x.arc(X,Y,R*2.2,0,7);x.fill();
+    x.fillStyle=col;x.beginPath();x.arc(X,Y,R,0,7);x.fill();x.strokeStyle='rgba(255,255,255,.35)';x.lineWidth=dpr;x.beginPath();x.arc(X,Y,R*.78,0,7);x.stroke();
+    x.fillStyle='#000';x.font=`700 ${R*.5}px system-ui`;x.textAlign='center';x.textBaseline='middle';x.fillText(i+1,X,Y+1);
+    x.fillStyle='#d7dbe6';x.font=`${9*dpr}px monospace`;x.fillText(AG[i][0],X,Y+R+11*dpr);x.textAlign='left';x.textBaseline='alphabetic'});
+  sonic(x,cx,cy,Math.min(W,H)*.085,t,look);
+  x.fillStyle='#d7dbe6';x.font=`700 ${11*dpr}px system-ui`;x.textAlign='center';x.fillText('SONIC · XAUUSD',cx,cy+Math.min(W,H)*.085+20*dpr);x.textAlign='left';
+  floaters=floaters.filter(f=>now-f.t<4000);
+  for(const f of floaters){const k=(now-f.t)/4000;x.globalAlpha=1-k;x.fillStyle=f.col;x.font=`700 ${15*dpr}px system-ui`;x.textAlign='center';x.fillText((f.side>0?'BUY ':'SELL ')+f.txt,cx,cy-Math.min(W,H)*.2-k*30*dpr);x.textAlign='left'}
+  x.globalAlpha=1;
+  const lt=floaters.at(-1);
+  $('orbL').innerHTML=`<span style="color:${AG[act][1]}">${AG[act][0]}</span>`;
+  $('orbR').innerHTML=lt?`<span class="${lt.tr.p>=0?'up':'dn'}">${hh(lt.tr.c)} · ${lt.tr.s>0?'BUY':'SELL'} ${fm(lt.tr.l,2)}</span>`:'';
+  requestAnimationFrame(orbit);
+}
+requestAnimationFrame(orbit);
+setInterval(()=>$('clock').textContent=new Date().toISOString().slice(11,19),1000);
+$('mul').addEventListener('change',fill);addEventListener('resize',fill);
+fetch('data.json?'+Date.now()).then(r=>r.json()).then(d=>{D=d;prep();fill()});
+</script>
+</body>
+</html>
