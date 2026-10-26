@@ -194,43 +194,48 @@ setInterval(()=>{if(!D)return;stage=(stage+1)%6;for(let i=0;i<6;i++)$('ag'+i).cl
 const trails=[];for(let i=0;i<220;i++)trails.push({a:Math.random()*6.283,s:.15+Math.random()*.5,rx:.78+Math.random()*.4,ry:.7+Math.random()*.45,ph:Math.random()*6.283,k:i%6,o:.12+Math.random()*.3});
 const t0=performance.now();
 function sonic(x,cx,cy,R,t,look){
-  // цифровой ёж: свечение, вращающиеся кольца-HUD, граненая голова, колючки-кристаллы, визор с глазами
+  // синий ёж в «цифровой» подаче: объёмный градиент, неоновый контур, грани, скан-линии
   const ex=look.x,ey=look.y,P=Math.PI;
-  let g=x.createRadialGradient(cx,cy,R*.3,cx,cy,R*3);g.addColorStop(0,'rgba(60,150,255,.42)');g.addColorStop(.5,'rgba(47,123,255,.12)');g.addColorStop(1,'rgba(47,123,255,0)');
+  let g=x.createRadialGradient(cx,cy,R*.3,cx,cy,R*3);g.addColorStop(0,'rgba(60,150,255,.40)');g.addColorStop(.55,'rgba(47,123,255,.10)');g.addColorStop(1,'rgba(47,123,255,0)');
   x.fillStyle=g;x.beginPath();x.arc(cx,cy,R*3,0,7);x.fill();
-  // кольца
-  x.save();x.translate(cx,cy);x.lineCap='round';
-  x.strokeStyle='rgba(90,200,255,.55)';x.lineWidth=1.4*dpr;x.setLineDash([R*.35,R*.18]);x.lineDashOffset=-t*R*.5;x.beginPath();x.arc(0,0,R*1.62,0,7);x.stroke();
-  x.setLineDash([R*.05,R*.12]);x.lineDashOffset=t*R*.3;x.strokeStyle='rgba(120,160,255,.45)';x.beginPath();x.arc(0,0,R*1.88,0,7);x.stroke();x.setLineDash([]);
-  x.strokeStyle='#4dd2ff';x.lineWidth=2.2*dpr;for(let k=0;k<3;k++){const a=t*.9+k*2.0944;x.beginPath();x.arc(0,0,R*1.62,a,a+.45);x.stroke()}
-  x.restore();
-  // колючки-кристаллы
-  for(let i=0;i<7;i++){const a=P*(.55+i*.135)+Math.sin(t*1.6+i*1.3)*.025,len=R*(1.55+.22*Math.sin(i*1.9)+.05*Math.sin(t*2+i)),w=.2;
-    const bx=cx+Math.cos(a)*R*.55,by=cy+Math.sin(a)*R*.55,tx=cx+Math.cos(a)*len,ty=cy+Math.sin(a)*len-R*.1;
-    const gq=x.createLinearGradient(bx,by,tx,ty);gq.addColorStop(0,'#1a3bd8');gq.addColorStop(1,'#59d8ff');x.fillStyle=gq;
-    x.beginPath();x.moveTo(cx+Math.cos(a-w)*R*.9,cy+Math.sin(a-w)*R*.9);x.lineTo(tx,ty);x.lineTo(cx+Math.cos(a+w)*R*.9,cy+Math.sin(a+w)*R*.9);x.closePath();x.fill();
-    x.strokeStyle='rgba(200,240,255,.55)';x.lineWidth=dpr*.8;x.beginPath();x.moveTo(cx+Math.cos(a)*R*.9,cy+Math.sin(a)*R*.9);x.lineTo(tx,ty);x.stroke()}
-  // голова: шестигранник с градиентом
-  const hex=(r,rot)=>{x.beginPath();for(let k=0;k<6;k++){const a=rot+k*P/3;k?x.lineTo(cx+Math.cos(a)*r,cy+Math.sin(a)*r):x.moveTo(cx+Math.cos(a)*r,cy+Math.sin(a)*r)}x.closePath()};
-  g=x.createLinearGradient(cx-R,cy-R,cx+R,cy+R);g.addColorStop(0,'#6fb8ff');g.addColorStop(.5,'#2a62f0');g.addColorStop(1,'#0e2a9c');
-  hex(R,P/6);x.fillStyle=g;x.fill();x.strokeStyle='#bfe6ff';x.lineWidth=1.6*dpr;x.stroke();
-  // грани
-  x.strokeStyle='rgba(190,230,255,.28)';x.lineWidth=dpr*.8;
-  for(let k=0;k<6;k+=1){const a=P/6+k*P/3;x.beginPath();x.moveTo(cx,cy);x.lineTo(cx+Math.cos(a)*R,cy+Math.sin(a)*R);x.stroke()}
-  hex(R*.64,P/6);x.stroke();
+  // колючки, загнутые назад (влево-вверх), с гранью и неоновой кромкой
+  const Q=[[-2.55,2.05,.46],[-2.15,2.1,.5],[-1.78,1.95,.46],[-3.0,1.75,.42],[-3.4,1.5,.38]];
+  Q.forEach(([a0,len,w],i)=>{const a=a0+Math.sin(t*1.4+i*1.2)*.03,sway=Math.sin(t*1.1+i)*R*.04;
+    const bx=cx+Math.cos(a)*R*.55,by=cy+Math.sin(a)*R*.55,tx=cx+Math.cos(a-.28)*R*len+sway,ty=cy+Math.sin(a-.28)*R*len+R*.18;
+    const nx=-Math.sin(a),ny=Math.cos(a);
+    const gq=x.createLinearGradient(bx,by,tx,ty);gq.addColorStop(0,'#1736c9');gq.addColorStop(.6,'#2f78ff');gq.addColorStop(1,'#7fe0ff');
+    x.beginPath();x.moveTo(bx+nx*R*w,by+ny*R*w);x.quadraticCurveTo((bx+tx)/2+nx*R*w*.9,(by+ty)/2+ny*R*w*.9-R*.12,tx,ty);x.quadraticCurveTo((bx+tx)/2-nx*R*w*.5,(by+ty)/2-ny*R*w*.5+R*.05,bx-nx*R*w,by-ny*R*w);x.closePath();
+    x.fillStyle=gq;x.fill();x.strokeStyle='rgba(170,235,255,.85)';x.lineWidth=1.3*dpr;x.stroke();
+    x.strokeStyle='rgba(255,255,255,.28)';x.lineWidth=dpr*.8;x.beginPath();x.moveTo(bx,by);x.lineTo(tx,ty);x.stroke()});
   // ушки
-  x.fillStyle='#2a62f0';x.strokeStyle='#bfe6ff';x.lineWidth=dpr;for(const dx of[-1,1]){x.beginPath();x.moveTo(cx+dx*R*.45,cy-R*.78);x.lineTo(cx+dx*R*.78,cy-R*1.32);x.lineTo(cx+dx*R*.88,cy-R*.52);x.closePath();x.fill();x.stroke()}
-  // визор
-  const vy=cy-R*.05,vh=R*.38;
-  x.save();x.beginPath();x.roundRect(cx-R*.78,vy-vh/2,R*1.56,vh,vh/2);x.fillStyle='#050a1c';x.fill();x.strokeStyle='#4dd2ff';x.lineWidth=1.4*dpr;x.stroke();x.clip();
-  const bl=(Math.sin(t*1.3)>.985)?.15:1,sx=cx-R*.78+((t*.6)%1)*R*1.56;
-  const gs=x.createLinearGradient(sx-R*.2,0,sx+R*.2,0);gs.addColorStop(0,'rgba(77,210,255,0)');gs.addColorStop(.5,'rgba(77,210,255,.35)');gs.addColorStop(1,'rgba(77,210,255,0)');x.fillStyle=gs;x.fillRect(sx-R*.2,vy-vh/2,R*.4,vh);
-  for(const dx of[-1,1]){const px=cx+dx*R*.36+ex*R*.12,py=vy+ey*R*.05,gl=x.createRadialGradient(px,py,0,px,py,R*.28);gl.addColorStop(0,'rgba(120,255,220,.9)');gl.addColorStop(1,'rgba(120,255,220,0)');x.fillStyle=gl;x.fillRect(px-R*.3,py-R*.3,R*.6,R*.6);
-    x.fillStyle='#b9fff0';x.beginPath();x.roundRect(px-R*.15,py-R*.09*bl,R*.3,R*.18*bl,R*.06);x.fill()}
+  for(const dx of[-1,1]){x.beginPath();x.moveTo(cx+dx*R*.3,cy-R*.86);x.lineTo(cx+dx*R*.62,cy-R*1.42);x.lineTo(cx+dx*R*.86,cy-R*.62);x.closePath();
+    const ge=x.createLinearGradient(cx,cy-R*1.4,cx,cy-R*.6);ge.addColorStop(0,'#5db0ff');ge.addColorStop(1,'#1f55e8');x.fillStyle=ge;x.fill();x.strokeStyle='rgba(170,235,255,.85)';x.lineWidth=1.3*dpr;x.stroke();
+    x.beginPath();x.moveTo(cx+dx*R*.46,cy-R*.86);x.lineTo(cx+dx*R*.62,cy-R*1.2);x.lineTo(cx+dx*R*.74,cy-R*.76);x.closePath();x.fillStyle='rgba(8,20,70,.75)';x.fill()}
+  // голова — объёмный шар
+  g=x.createRadialGradient(cx-R*.35,cy-R*.4,R*.1,cx,cy,R*1.05);g.addColorStop(0,'#8fd0ff');g.addColorStop(.35,'#3d86ff');g.addColorStop(1,'#0f2aa8');
+  x.fillStyle=g;x.beginPath();x.arc(cx,cy,R,0,7);x.fill();
+  x.save();x.beginPath();x.arc(cx,cy,R,0,7);x.clip();
+  // цифровая сетка и скан-линии
+  x.strokeStyle='rgba(180,230,255,.14)';x.lineWidth=dpr*.7;
+  for(let k=-4;k<=4;k++){x.beginPath();x.moveTo(cx+k*R*.28-R,cy-R);x.lineTo(cx+k*R*.28+R,cy+R);x.stroke()}
+  for(let k=0;k<14;k++){x.fillStyle='rgba(0,10,50,.10)';x.fillRect(cx-R,cy-R+k*R*.15,R*2,R*.05)}
+  const sy=cy-R+((t*.35)%1)*R*2;g=x.createLinearGradient(0,sy-R*.15,0,sy+R*.15);g.addColorStop(0,'rgba(120,230,255,0)');g.addColorStop(.5,'rgba(120,230,255,.35)');g.addColorStop(1,'rgba(120,230,255,0)');x.fillStyle=g;x.fillRect(cx-R,sy-R*.15,R*2,R*.3);
   x.restore();
-  // нос-индикатор и подбородок
-  x.fillStyle='#4dd2ff';x.beginPath();x.moveTo(cx-R*.1,cy+R*.42);x.lineTo(cx+R*.1,cy+R*.42);x.lineTo(cx,cy+R*.56);x.closePath();x.fill();
-  x.strokeStyle='rgba(190,230,255,.6)';x.lineWidth=dpr;x.beginPath();x.moveTo(cx-R*.3,cy+R*.68);x.lineTo(cx+R*.3,cy+R*.68);x.stroke();
+  x.strokeStyle='#9fe6ff';x.lineWidth=1.8*dpr;x.beginPath();x.arc(cx,cy,R,0,7);x.stroke();
+  // мордочка
+  g=x.createRadialGradient(cx+R*.05,cy+R*.2,R*.05,cx+R*.1,cy+R*.3,R*.7);g.addColorStop(0,'#ffe8c8');g.addColorStop(1,'#d9a273');
+  x.fillStyle=g;x.beginPath();x.ellipse(cx+R*.1,cy+R*.3,R*.62,R*.5,0,0,7);x.fill();x.strokeStyle='rgba(255,230,200,.7)';x.lineWidth=dpr;x.stroke();
+  // глаза: стекло с зелёной радужкой
+  const bl=(Math.sin(t*1.3)>.985)?.15:1;
+  for(const dx of[-1,1]){const px=cx+dx*R*.27+ex*R*.08,py=cy-R*.14+ey*R*.06;
+    x.fillStyle='#eaf6ff';x.beginPath();x.ellipse(px,py,R*.23,R*.33*bl,0,0,7);x.fill();x.strokeStyle='#0a1a60';x.lineWidth=1.2*dpr;x.stroke();
+    if(bl>.5){const ix=px+ex*R*.1+dx*R*.02,iy=py+ey*R*.12;g=x.createRadialGradient(ix,iy,0,ix,iy,R*.17);g.addColorStop(0,'#9dffd0');g.addColorStop(1,'#12a36a');x.fillStyle=g;x.beginPath();x.arc(ix,iy,R*.14,0,7);x.fill();
+      x.fillStyle='#02101c';x.beginPath();x.arc(ix,iy,R*.07,0,7);x.fill();x.fillStyle='rgba(255,255,255,.9)';x.beginPath();x.arc(ix-R*.05,iy-R*.06,R*.035,0,7);x.fill()}}
+  // нос и рот
+  x.fillStyle='#050a18';x.beginPath();x.ellipse(cx+R*.05,cy+R*.2,R*.1,R*.07,0,0,7);x.fill();x.fillStyle='rgba(255,255,255,.7)';x.beginPath();x.arc(cx+R*.02,cy+R*.18,R*.025,0,7);x.fill();
+  x.strokeStyle='#5a2c18';x.lineWidth=1.4*dpr;x.beginPath();x.moveTo(cx-R*.14,cy+R*.5);x.quadraticCurveTo(cx+R*.12,cy+R*.62,cx+R*.4,cy+R*.46);x.stroke();
+  // тонкое кольцо-HUD
+  x.save();x.translate(cx,cy);x.setLineDash([R*.3,R*.2]);x.lineDashOffset=-t*R*.45;x.strokeStyle='rgba(90,210,255,.5)';x.lineWidth=1.3*dpr;x.beginPath();x.arc(0,0,R*1.75,0,7);x.stroke();x.restore();x.setLineDash([]);
 }
 let look={x:0,y:0};
 function orbit(now){
