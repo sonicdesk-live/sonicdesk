@@ -154,7 +154,8 @@ function fill(){
   $('k_all').innerHTML=`<span class="up">${usd(S.eq)}</span>`;$('k_n').textContent=S.n;$('k_wr').textContent=fm(S.wr*100,1)+'%';
   $('pill').textContent='ИСТОРИЯ ДО '+lastd.toISOString().slice(0,10);
   $('eqmeta').textContent=`${hh(TR[0].c).slice(0,5)} → ${lastd.toISOString().slice(5,10)} · ${S.n} СДЕЛОК`;
-  $('tick').innerHTML=(TR.slice(-24).reverse().map(t=>`<b>${t.s>0?'BUY':'SELL'}</b> ${fm(t.l,2)} лота <span class="${t.p>=0?'up':'dn'}">${sgn(t.p*M)}</span>`).join(' &nbsp;│&nbsp; ')+' &nbsp;│&nbsp; ').repeat(2);
+  const tk=(TR.slice(-24).reverse().map(t=>`<b>${t.s>0?'BUY':'SELL'}</b> ${fm(t.l,2)} лота <span class="${t.p>=0?'up':'dn'}">${sgn(t.p*M)}</span>`).join(' &nbsp;│&nbsp; ')+' &nbsp;│&nbsp; ').repeat(2);
+  if($('tick').dataset.k!==tk){$('tick').innerHTML=tk;$('tick').dataset.k=tk}
   drawEq();drawMon();table();cal();
 }
 function drawEq(){
@@ -230,7 +231,9 @@ function orbit(now){
 }
 requestAnimationFrame(orbit);
 setInterval(()=>$('clock').textContent=new Date().toISOString().slice(11,19),1000);
-$('mul').addEventListener('change',fill);addEventListener('resize',fill);
+let lastW=innerWidth;
+$('mul').addEventListener('change',fill);
+addEventListener('resize',()=>{if(innerWidth!==lastW){lastW=innerWidth;drawEq();drawMon()}});
 fetch('data.json?'+Date.now()).then(r=>r.json()).then(d=>{D=d;prep();fill()});
 </script>
 </body>
