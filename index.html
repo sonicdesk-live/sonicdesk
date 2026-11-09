@@ -253,9 +253,9 @@ function table(){
 }
 // ---- калькулятор ----
 // Доходность считаем на 1 лот, чтобы убрать влияние множителя и смены размера лота.
-// Лот подбирается так, чтобы худшая просадка истории (по закрытым сделкам) была DDT от депозита: lot = K·капитал.
+// Лот = 0,01 на каждые $1000 капитала (K = 1e-5 лота на $1): Sonic в последний год торгует 0,1 лота, что соответствует счёту $10 000.
 // «Без реинвеста»: лот фиксирован от стартового депозита, прибыль выводится. «С реинвестом»: лот пересчитывается раз в день от капитала.
-const CALC={dep:10000,per:'year',DDT:.1,HAIR:.5,ready:false};
+const CALC={dep:10000,per:'year',LPD:1e-5,HAIR:.5,ready:false};
 const PERS=[['year','ГОД НАЗАД'],['all','С НАЧАЛА ИСТОРИИ']];
 function calcPrep(){
   let e=0,pk=0,dd=0;TR.forEach(t=>{t.q=t.p/t.l;e+=t.q;pk=Math.max(pk,e);dd=Math.max(dd,pk-e)});CALC.ddl=dd;
@@ -273,7 +273,7 @@ function calcPrep(){
 }
 function calc(){
   if(!CALC.ready)return;
-  const dep=Math.max(CALC.dep,1),K=CALC.DDT/CALC.ddl,yr=CALC.per==='year';
+  const dep=Math.max(CALC.dep,1),K=CALC.LPD,yr=CALC.per==='year';
   document.querySelectorAll('#cchips .chip').forEach(b=>b.classList.toggle('on',+b.dataset.v===CALC.dep));
   document.querySelectorAll('#cper .chip').forEach(b=>b.classList.toggle('on',b.dataset.p===CALC.per));
   const from=yr?D.asof-365*86400:0,tr=TR.filter(t=>t.c>=from),t0=tr[0].c;
@@ -287,7 +287,7 @@ function calc(){
   $('cres').innerHTML=card('a','С РЕИНВЕСТОМ','сложный процент: лот растёт вместе с капиталом, пересчёт каждый день',ec,dep)+
     card('','БЕЗ РЕИНВЕСТА','лот не меняется, прибыль выводите себе',es,dep);
   $('cnote').className='cnote';
-  $('cnote').innerHTML=`Расчёт по публичной истории Sonic, а не обещание. Лот подобран так, чтобы худшая просадка истории была около ${CALC.DDT*100}% депозита (${fm(K*dep,2)} лота на ваш депозит). Прошлые результаты не гарантируют будущих.`;
+  $('cnote').innerHTML=`Расчёт по публичной истории Sonic, а не обещание. Размер сделки как у самого Sonic: 0,01 лота на каждые $1000, то есть ${fm(K*dep,2)} лота на ваш депозит. Сделки и цены взяты из публичной истории без подгонки. Прошлые результаты не гарантируют будущих.`;
   drawLines($('ceq'),[A,B],['#4d8dff','#27e08a'],dep,v=>dt(v).toISOString().slice(0,7));
 }
 function drawLines(cv,S,cols,dep,lab,dash){
