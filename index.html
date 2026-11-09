@@ -61,7 +61,12 @@ td{text-align:right;padding:4px;border-bottom:1px solid #10131b;font-variant-num
 .cta{margin:8px 8px 0;padding:16px 18px;border:1px solid #1d3a73;border-radius:6px;background:linear-gradient(100deg,#0a1230,#0a0c12 70%);display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 .cta b{display:block;font:700 17px system-ui,sans-serif}.cta span{color:var(--mut);font-size:11px}
 .cta .btn{margin-left:auto;font-size:13px;padding:12px 20px}
-.calc{margin:8px 8px 0}
+.calc{margin:14px 8px 0;border-color:#2f7bff;background:linear-gradient(160deg,#0b1634,#0a0c12 55%);box-shadow:0 0 34px -12px #2f7bff;padding:16px}
+.ctitle{margin-bottom:16px}
+.ctitle b{display:block;font:800 30px/1.1 system-ui,sans-serif;letter-spacing:.02em;color:#fff;text-shadow:0 0 22px #2f7bff}
+.ctitle span{display:block;font:500 14px/1.4 system-ui,sans-serif;color:#9fb8ee;margin:6px 0 8px}
+.ctitle .tag{font-style:normal}
+@media(max-width:820px){.ctitle b{font-size:24px}}
 .calc .tag{color:var(--amb);border:1px solid #5c4a1d;border-radius:4px;padding:3px 7px;font-size:9px;letter-spacing:.1em;white-space:nowrap}
 .ctl{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:flex-end;margin-bottom:12px}
 .ctl label{display:flex;flex-direction:column;gap:4px;font-size:8px;color:var(--mut);letter-spacing:.12em}
@@ -139,24 +144,6 @@ td{text-align:right;padding:4px;border-bottom:1px solid #10131b;font-variant-num
   <a class="btn" href="https://t.me/Aigoldx_bot?start=site_mid" target="_blank" rel="noopener">Узнать подробнее →</a>
 </div>
 
-<div class="card calc">
-  <div class="h"><span>◆ КАЛЬКУЛЯТОР · СКОЛЬКО БЫ ВЫ ЗАРАБОТАЛИ ПО ИСТОРИИ SONIC</span><span class="tag" id="ctag">РАСЧЁТ ПО ИСТОРИИ</span></div>
-  <div class="ctl">
-    <label>ВАШ ДЕПОЗИТ<div class="dep"><i>$</i><input id="cdep" inputmode="numeric" autocomplete="off" value="10000"></div></label>
-    <label>БЫСТРЫЙ ВЫБОР<div class="chips" id="cchips"></div></label>
-    <label>ВХОД<div class="chips" id="cper"></div></label>
-  </div>
-  <div class="csec" id="chist"></div>
-  <div class="cres" id="cres"></div>
-  <div class="lg"><span><i style="background:#4d8dff"></i>С РЕИНВЕСТОМ</span><span><i style="background:#27e08a"></i>БЕЗ РЕИНВЕСТА</span></div>
-  <canvas id="ceq"></canvas>
-  <div class="csec fc">ЧТО БУДЕТ ДАЛЬШЕ <span class="tag">ПРОГНОЗ · РАСЧЁТ ПО ИСТОРИИ, НЕ ОБЕЩАНИЕ</span></div>
-  <div class="cres" id="cfres"></div>
-  <canvas id="cfc"></canvas>
-  <div class="cnote" id="cnote"></div>
-  <div style="margin-top:12px"><a class="btn" href="https://t.me/Aigoldx_bot?start=site_calc" target="_blank" rel="noopener">Узнать подробнее →</a></div>
-</div>
-
 <div class="card orbit">
   <div class="h"><span>◆ СОНИК · ШЕСТЬ СИГНАЛОВ · ЗОЛОТО</span><span id="orbmeta">ПОВТОР ИСТОРИИ</span></div>
   <div class="px" id="orbL"></div><div class="px2" id="orbR"></div>
@@ -176,7 +163,22 @@ td{text-align:right;padding:4px;border-bottom:1px solid #10131b;font-variant-num
   </div>
 </div>
 
-<a class="btn fab" href="https://t.me/Aigoldx_bot?start=site_fab" target="_blank" rel="noopener">Узнать подробнее →</a>
+<div class="card calc">
+  <div class="ctitle"><b>КАЛЬКУЛЯТОР ДОХОДНОСТИ</b><span>Выберите депозит и узнайте, сколько заработал бы Sonic на вашем счёте</span><i class="tag">РАСЧЁТ ПО ИСТОРИИ</i></div>
+  <div class="ctl">
+    <label>ВАШ ДЕПОЗИТ<div class="dep"><i>$</i><input id="cdep" inputmode="numeric" autocomplete="off" value="10000"></div></label>
+    <label>БЫСТРЫЙ ВЫБОР<div class="chips" id="cchips"></div></label>
+    <label>ВХОД<div class="chips" id="cper"></div></label>
+  </div>
+  <div class="csec" id="chist"></div>
+  <div class="cres" id="cres"></div>
+  <div class="lg"><span><i style="background:#4d8dff"></i>С РЕИНВЕСТОМ</span><span><i style="background:#27e08a"></i>БЕЗ РЕИНВЕСТА</span></div>
+  <canvas id="ceq"></canvas>
+  <div class="cnote" id="cnote"></div>
+  <div style="margin-top:12px"><a class="btn" href="https://t.me/Aigoldx_bot?start=site_calc" target="_blank" rel="noopener">Узнать подробнее →</a></div>
+</div>
+
+<a class="btn fab"href="https://t.me/Aigoldx_bot?start=site_fab" target="_blank" rel="noopener">Узнать подробнее →</a>
 
 <script>
 const MN=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
@@ -284,16 +286,9 @@ function calc(){
   const card=(cls,t,sub,end,b)=>`<div class="${cls}"><em>${t}<small>${sub}</small></em><b class="up">${usd(end)}</b><u class="up">${pc(end,b)}</u><span>прибыль ${sgn(end-b)}</span></div>`;
   $('cres').innerHTML=card('a','С РЕИНВЕСТОМ','сложный процент: лот растёт вместе с капиталом, пересчёт каждый день',ec,dep)+
     card('','БЕЗ РЕИНВЕСТА','лот не меняется, прибыль выводите себе',es,dep);
-  // прогноз: средний месяц последних 12 мес., половина от него
-  const r=CALC.avg*CALC.HAIR*K,step=r*dep,F=[[0,dep,dep]];let fc=dep;
-  for(let i=1;i<=24;i++){fc*=1+r;F.push([i,fc,dep+step*i])}
-  const f=(i)=>F[i];
-  $('cfres').innerHTML=[12,24].map(m=>{const y=m/12,w=y===1?'ЧЕРЕЗ 1 ГОД':'ЧЕРЕЗ 2 ГОДА';
-    return `<div class="fcb"><em>${w}<small>с реинвестом / без реинвеста</small></em><b>${usd(f(m)[1])}</b><u class="up">${pc(f(m)[1],dep)}</u><span>без реинвеста: ${usd(f(m)[2])} · ${pc(f(m)[2],dep)}</span></div>`}).join('');
   $('cnote').className='cnote';
-  $('cnote').innerHTML=`Расчёт по публичной истории Sonic, а не обещание. Лот подобран так, чтобы худшая просадка истории была около ${CALC.DDT*100}% депозита (${fm(K*dep,2)} лота на ваш депозит). Прогноз: средний месяц последних 12 месяцев, в расчёт берётся половина. Прошлые результаты не гарантируют будущих.`;
+  $('cnote').innerHTML=`Расчёт по публичной истории Sonic, а не обещание. Лот подобран так, чтобы худшая просадка истории была около ${CALC.DDT*100}% депозита (${fm(K*dep,2)} лота на ваш депозит). Прошлые результаты не гарантируют будущих.`;
   drawLines($('ceq'),[A,B],['#4d8dff','#27e08a'],dep,v=>dt(v).toISOString().slice(0,7));
-  drawLines($('cfc'),[F.map(p=>[p[0],p[1]]),F.map(p=>[p[0],p[2]])],['#ff9f2e','#27e08a'],dep,v=>v%12===0?(v/12?v/12+' г.':'сейчас'):'',true);
 }
 function drawLines(cv,S,cols,dep,lab,dash){
   const x=fit(cv),W=cv.width,H=cv.height;x.clearRect(0,0,W,H);
