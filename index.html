@@ -79,7 +79,7 @@ td{text-align:right;padding:4px;border-bottom:1px solid #10131b;font-variant-num
 .chip.on{border-color:var(--son);color:#fff;background:#0d1a3d;box-shadow:0 0 12px -4px var(--son)}
 .csec{font:700 15px system-ui,sans-serif;letter-spacing:.04em;margin:18px 0 10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .csec.fc{color:var(--amb)}
-.cres{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.cres{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:12px}
 .cres>div{border:1px solid var(--line);border-radius:8px;padding:14px 16px;background:#080a10}
 .cres>div.a{border-color:#1d3a73;box-shadow:0 0 22px -10px var(--son)}
 .cres>div.fcb{border-color:#5c4a1d}
@@ -172,7 +172,6 @@ td{text-align:right;padding:4px;border-bottom:1px solid #10131b;font-variant-num
   </div>
   <div class="csec" id="chist"></div>
   <div class="cres" id="cres"></div>
-  <div class="lg"><span><i style="background:#4d8dff"></i>С РЕИНВЕСТОМ</span><span><i style="background:#27e08a"></i>БЕЗ РЕИНВЕСТА</span></div>
   <canvas id="ceq"></canvas>
   <div class="cnote" id="cnote"></div>
   <div style="margin-top:12px"><a class="btn" href="https://t.me/Aigoldx_bot?start=site_calc" target="_blank" rel="noopener">Узнать подробнее →</a></div>
@@ -278,17 +277,15 @@ function calc(){
   document.querySelectorAll('#cper .chip').forEach(b=>b.classList.toggle('on',b.dataset.p===CALC.per));
   const from=yr?D.asof-365*86400:0,tr=TR.filter(t=>t.c>=from),t0=tr[0].c;
   // история: две кривые по сделкам (X — время)
-  let es=dep,ec=dep,day=null,lot=0;const A=[[t0,dep]],B=[[t0,dep]];
-  tr.forEach(t=>{const d=Math.floor(t.c/86400);if(d!==day){day=d;lot=K*ec}
-    es+=t.q*K*dep;ec+=t.q*lot;A.push([t.c,ec]);B.push([t.c,es])});
+  let es=dep;const B=[[t0,dep]];
+  tr.forEach(t=>{es+=t.q*K*dep;B.push([t.c,es])});
   const pc=(v,b)=>(v>=b?'+':'−')+fm(Math.abs(v-b)/b*100,0)+'%';
   $('chist').textContent=`ЕСЛИ БЫ ВЫ ЗАШЛИ С ${usd(dep)} ${yr?'ГОД НАЗАД':'В САМОМ НАЧАЛЕ ('+MN[dt(t0).getUTCMonth()].toLowerCase()+' '+dt(t0).getUTCFullYear()+')'}`;
   const card=(cls,t,sub,end,b)=>`<div class="${cls}"><em>${t}<small>${sub}</small></em><b class="up">${usd(end)}</b><u class="up">${pc(end,b)}</u><span>прибыль ${sgn(end-b)}</span></div>`;
-  $('cres').innerHTML=card('a','С РЕИНВЕСТОМ','сложный процент: лот растёт вместе с капиталом, пересчёт каждый день',ec,dep)+
-    card('','БЕЗ РЕИНВЕСТА','лот не меняется, прибыль выводите себе',es,dep);
+  $('cres').innerHTML=card('a','ВАШ РЕЗУЛЬТАТ',`лот пропорционален депозиту: ${fm(K*dep,2)} лота на ${usd(dep)}`,es,dep);
   $('cnote').className='cnote';
   $('cnote').innerHTML=`Расчёт по публичной истории Sonic, а не обещание. Размер сделки как у самого Sonic: 0,01 лота на каждые $1000, то есть ${fm(K*dep,2)} лота на ваш депозит. Сделки и цены взяты из публичной истории без подгонки. Прошлые результаты не гарантируют будущих.`;
-  drawLines($('ceq'),[A,B],['#4d8dff','#27e08a'],dep,v=>dt(v).toISOString().slice(0,7));
+  drawLines($('ceq'),[B],['#27e08a'],dep,v=>dt(v).toISOString().slice(0,7));
 }
 function drawLines(cv,S,cols,dep,lab,dash){
   const x=fit(cv),W=cv.width,H=cv.height;x.clearRect(0,0,W,H);
